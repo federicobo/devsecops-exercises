@@ -3,7 +3,6 @@ name: Site scanner
 on:
   workflow_dispatch:
 
-
 jobs:
   DAST-scan:
     name: DAST site scanner
@@ -11,7 +10,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        port: [31546,31547]
+        cluster_ip: [18.185.179.187]
+        port: [31546, 31547]
 
     steps:
       - name: ZAP Scan

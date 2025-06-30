@@ -5,7 +5,8 @@ Questa repository nasce per raccogliere gli esercizi e per fornire le istruzioni
 ## Prerequisiti Base 
 Per poter effettuare le operazioni richieste negli esercizi è necessario avere un account GitHub (è free):  
 https://github.com/signup
-**Ricordatevi di portare con voi il PC ed il caricabatterie!**
+
+**Nel caso di erogazione del corso in presenza, ricordatevi di portare con voi il PC ed il caricabatterie!**
 
 Per poter fruire al meglio degli strumenti che andremo ad utilizzare assieme nel corso, è altamente consigliato di avere un pc con una distrubuzione Linux, o alternativamente una VM (anche WSL di linux va bene!).
 
@@ -28,7 +29,6 @@ https://hub.docker.com/signup
 
 Una volta creato l'account sarà possibile generare un access token, questo è effettuabile seguendo gli step al seguente link:  
 https://docs.docker.com/security/for-developers/access-tokens/
-
 
 #### Forked Repo docker hub permissions
 
@@ -60,6 +60,19 @@ Nel caso abbiate un IDE preferito, potete effettuare la clone della repository d
 ### Generazione chiave SSH su github
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 
+### Installazione Docker e pull immagini
+
+Alcuni degli esercizi che svolgeremo durante il corso prevedono l'utilizzo di un software di containerizzazione. Per la sua popolarità e documentazione consigliamo l'utilizzo di **docker**, ma si adattano allo scopo le alternative equivalenti **podman** e **containerd**.  
+
+Per utilizzare **docker**, troverete al seguente indirizzo le istruzioni di installazione specifiche per il sistema operativo Linux che utilizzerete durante il corso:  
+https://docs.docker.com/engine/install/  
+
+
+Per velocizzare la fruzione dei contenuti, una volta installato **docker**, scaricate le seguenti immagini sulla vostra workstation nei giorni precedenti all'inizio del corso:
+- `docker pull aquasec/trivy`
+- `docker pull zaproxy/zap-stable:2.15.0`
+- `docker pull appsecco/dvna:sqlite`
+
 # Risorse esterne
 In questa sezione, i link agli strumenti e alle risorse esterne condivise durante la formazione.
 
@@ -88,12 +101,20 @@ https://github.com/OWASP/threat-dragon
 **CodeQL supported languages** - https://codeql.github.com/docs/codeql-overview/supported-languages-and-frameworks/  
 **SonarQube supported languages** - https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/languages/overview/  
 
+## DAST
+**ZAP GitHub Action** - https://github.com/marketplace/actions/zap-full-scan  
+**ZAP Custom Auth Scripts** - https://www.zaproxy.org/docs/authentication/handling-auth-yourself/  
+**ZAProxy (CheckMarx)** - https://www.zaproxy.org/download  
+**BurpSuite (PortSwigger)** - https://portswigger.net/burp/communitydownload  
+**Nuclei (ProjectDiscovery)** - https://projectdiscovery.io/nuclei
+
 ## Image Scan
 **Docker Scout** - https://docs.docker.com/scout/quickstart/
 
 ## Security frameworks
 **5D framework** - https://owasp.org/www-project-software-security-5d-framework/  
 **SCVS** - https://owasp.org/www-project-software-component-verification-standard/  
+**SCVS JSON** - https://github.com/OWASP/Software-Component-Verification-Standard/releases/download/1.0/OWASP_SCVS-1.0.json  
 **ASVS** - https://owasp.org/www-project-application-security-verification-standard/
 
 ## OWASP Vulnerable Apps
