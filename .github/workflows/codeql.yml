@@ -29,7 +29,7 @@ jobs:
     steps:
       # Checkout the repo, this will setup the pipeline with our actual codebase
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Setup CodeQL tool, with this setup step, we are specifying the language of the scan, and also some extra arguments in a configuration file
       - name: Initialize CodeQL
