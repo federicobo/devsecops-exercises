@@ -8,7 +8,7 @@ file and open a PR! The same goes for any scripts or automated tools you made fo
 > themselves are not individually tagged! You might not want to view
 > anything from this page before tackling the related challenges
 > yourself! :broken_heart: marks resources which rely on
-> [_some form of cheating_](https://pwning.owasp-juice.shop/part1/rules.html#%E2%9D%8C-things-considered-cheating)
+> [_some form of cheating_](https://pwning.owasp-juice.shop/companion-guide/latest/part1/rules.html#_things_considered_cheating)
 > to solve a challenge.
 >
 > 🧃 is followed by the last known major release of OWASP Juice Shop
@@ -23,6 +23,27 @@ file and open a PR! The same goes for any scripts or automated tools you made fo
 
 ## Hacking Videos
 
+* [7 Minute Security](https://7ms.us) Podcast (🧃`v16.x`)
+  * Episode #606: [7MS #606: Hacking OWASP Juice Shop (2024 edition)]() ([YouTube](https://www.youtube.com/watch?v=-1rpelarf2E))
+  * Legacy Episodes (🧃`v2.x`)
+    * Episode #234:
+      [7MS #234: Pentesting OWASP Juice Shop - Part 5](https://7ms.us/7ms-234-pentesting-owasp-juice-shop-part5/)
+      ([YouTube](https://www.youtube.com/watch?v=lGVAXCfFwv0))
+    * Episode #233:
+      [7MS #233: Pentesting OWASP Juice Shop - Part 4](https://7ms.us/7ms-233-pentesting-owasp-juice-shop-part-4/)
+      ([YouTube](https://www.youtube.com/watch?v=1hhd9EwX7h0))
+    * Episode #232:
+      [7MS #232: Pentesting OWASP Juice Shop - Part 3](https://7ms.us/7ms-232-pentesting-owasp-juice-shop-part-3/)
+      ([YouTube](https://www.youtube.com/watch?v=F8iRF2d-YzE))
+    * Episode #231:
+      [7MS #231: Pentesting OWASP Juice Shop - Part 2](https://7ms.us/7ms-231-pentesting-owasp-juice-shop-part-2/)
+      ([YouTube](https://www.youtube.com/watch?v=523l4Pzhimc))
+    * Episode #230:
+      [7MS #230: Pentesting OWASP Juice Shop - Part 1](https://7ms.us/7ms-230-pentesting-owasp-juice-shop-part-1/)
+      ([YouTube](https://www.youtube.com/watch?v=Cz37iejTsH4))
+    * Episode #229:
+      [7MS #229: Intro to Docker for Pentesters](https://7ms.us/7ms-229-intro-to-docker-for-pentesters/)
+      ([YouTube](https://youtu.be/WIpxvBpnylI?t=407))
 * [How to Solve Juiceshop Challenges - Intern Talks](https://www.youtube.com/watch?v=dqxdbIWFD5c) by [Indian Servers University](https://www.youtube.com/c/IndianServersUniversity) (🧃`v11.x`)
 * [Hacking the OWASP Juice Shop Series](https://www.youtube.com/playlist?list=PLcsrjMNFrcmbAFV8BxDKXZCcPrOlaYfWK) playlist of [Compass IT Compliance](https://www.youtube.com/channel/UCccfSU7EGGTS76hz2i6qdrg) (🧃`v12.x`)
   * [Hacking the OWASP Juice Shop Series - Deploying the Juice Shop](https://youtu.be/qjrEMEztxWM)
@@ -98,9 +119,13 @@ file and open a PR! The same goes for any scripts or automated tools you made fo
       :broken_heart:
     * [★★★★★ Change Benders Password (Broken Authentication)](https://youtu.be/J3BSi-z9_7I)
     * [★★★★★ Extra Language (Broken Anti Automation)](https://youtu.be/KU2LzxABetk)
-* [Broken Authentication and SQL Injection - OWASP Juice Shop TryHackMe](https://youtu.be/W4MXUnZB2jc)
-  by
-  [Motasem Hamdan - CyberSecurity Trainer](https://www.youtube.com/channel/UCNSdU_1ehXtGclimTVckHmQ)
+* [Try Hack Me - OWASP Juice Shop](https://www.youtube.com/watch?v=xDQt-I7pncY) by [Silesio Carvalho](https://www.youtube.com/@silesiocarvalho) (🧃`v12.x`)
+* [OWASP Juice Shop | TryHackMe](https://www.youtube.com/playlist?list=PLqM63j87R5p6Nc7XYSdQ7mnrdEsFGfUj0) series
+  by [Motasem Hamdan - CyberSecurity Trainer](https://www.youtube.com/channel/UCNSdU_1ehXtGclimTVckHmQ)
+  as part of [TryHackMe OWASP Juice Shop | The Complete Guide](https://motasemhamdan.medium.com/tryhackme-owasp-juice-shop-the-complete-guide-80c996df25c7) (🧃`v12.x`)
+    * [Broken Authentication and SQL Injection](https://youtu.be/W4MXUnZB2jc)
+    * [Exposing Sensitive Data and Viewing other users shopping carts](https://youtu.be/AdncxIRp0SI)
+    * [Solving OWASP Juice Shop Stored and Reflected XSS](https://youtu.be/_s6VZRV-TDY)
 * Live Hacking von Online-Shop „Juice Shop” (:de:)
   [Twitch live stream](https://www.twitch.tv/GregorBiswanger) recordings by
   [Gregor Biswanger](https://www.youtube.com/channel/UCGMA9qDbIQ-EhgLD-ZrsHWw)
@@ -120,31 +145,12 @@ file and open a PR! The same goes for any scripts or automated tools you made fo
 * [Hacking JavaScript - Intro to Hacking Web Apps (Episode 3)](https://youtu.be/ejB1i5n_d7o)
   by Arthur Kay (🧃`v8.x`)
 * [HackerSploit](https://www.youtube.com/channel/UC0ZTPkdxlAKf-V33tqXwi3Q)
-  Youtube channel (🧃`v7.x`)
+  YouTube channel (🧃`v7.x`)
     * [OWASP Juice Shop - SQL Injection](https://youtu.be/nH4r6xv-qGg)
     * [Web App Penetration Testing - #15 - HTTP Attributes (Cookie Stealing)](https://youtu.be/8s3ChNKU85Q)
     * [Web App Penetration Testing - #14 - Cookie Collection & Reverse Engineering](https://youtu.be/qtr0qtptYys)
     * [Web App Penetration Testing - #13 - CSRF (Cross Site Request Forgery)](https://youtu.be/TwG0Rd0hr18)
     * [How To Install OWASP Juice Shop](https://youtu.be/tvNKp1QXV_8)
-* [7 Minute Security](https://7ms.us) Podcast (🧃`v2.x`)
-    * Episode #234:
-      [7MS #234: Pentesting OWASP Juice Shop - Part 5](https://7ms.us/7ms-234-pentesting-owasp-juice-shop-part5/)
-      ([Youtube](https://www.youtube.com/watch?v=lGVAXCfFwv0))
-    * Episode #233:
-      [7MS #233: Pentesting OWASP Juice Shop - Part 4](https://7ms.us/7ms-233-pentesting-owasp-juice-shop-part-4/)
-      ([Youtube](https://www.youtube.com/watch?v=1hhd9EwX7h0))
-    * Episode #232:
-      [7MS #232: Pentesting OWASP Juice Shop - Part 3](https://7ms.us/7ms-232-pentesting-owasp-juice-shop-part-3/)
-      ([Youtube](https://www.youtube.com/watch?v=F8iRF2d-YzE))
-    * Episode #231:
-      [7MS #231: Pentesting OWASP Juice Shop - Part 2](https://7ms.us/7ms-231-pentesting-owasp-juice-shop-part-2/)
-      ([Youtube](https://www.youtube.com/watch?v=523l4Pzhimc))
-    * Episode #230:
-      [7MS #230: Pentesting OWASP Juice Shop - Part 1](https://7ms.us/7ms-230-pentesting-owasp-juice-shop-part-1/)
-      ([Youtube](https://www.youtube.com/watch?v=Cz37iejTsH4))
-    * Episode #229:
-      [7MS #229: Intro to Docker for Pentesters](https://7ms.us/7ms-229-intro-to-docker-for-pentesters/)
-      ([Youtube](https://youtu.be/WIpxvBpnylI?t=407))
 
 ## Walkthroughs
 

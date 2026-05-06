@@ -51,11 +51,34 @@ Per effettuarlo, dovrete effettuare i seguenti passi:
 Come riferimento, ecco la documentazione per la gestione dei secrets di github:  
 https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions
 
-<br/>
+### Dependency Track
+Per velocizzare il download e alleggerire gli esercizi dagli step di configurazione, é necessario effettuare le seguenti operazioni una volta installato docker sul computer/vm che userete durante il corso:
+#### Esecuzione di dependency track
+Eseguite il seguente comando dalla root di questo repository:
+```
+cd dtrack
+docker compose up -d
+```
+In questo modo scaricherete le immagini docker necessarie all'applicativo, che verrá successivamente eseguito.  
+Una volta in esecuzione scaricherá i dati aggiuntivi necessari a fruire delle sue funzionalitá.
+
+#### Creazione API key per dependency track
+Per evitare il rate limiting delle API pubbliche imposti dai distributori dei dati sulle CVE, é necessario impostare dei token di accesso personali per i DB di GitHub Advisories e del NIST.  
+Assicuratevi di salvare entrambi token in modo che siano facilmente accessibili in un secondo momento.
+
+##### GitHub
+Navigate al seguente link e create un token (classic), richiede un account GitHub:  
+https://github.com/settings/tokens  
+Il token non necessita di scope, ne di accesso alle repository.
+
+##### NIST
+Navigare al seguente link e compilate la form con i vostri dati:  
+https://nvd.nist.gov/developers/request-an-api-key  
+Una volta inviata la form, seguite le istruzioni della mail per ottenere l'API key che utilizzeremo durante il corso.
 
 ## Extra
 
-Nel caso abbiate un IDE preferito, potete effettuare la clone della repository di cui avete effettuato il fork, effettuando il setup delle configurazioni del client git come di consueto.
+Nel caso abbiate un IDE preferito, potete effettuare il clone della repository di cui avete effettuato il fork, effettuando il setup delle configurazioni del client git come di consueto.
 
 ### Generazione chiave SSH su github
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
@@ -71,7 +94,6 @@ https://docs.docker.com/engine/install/
 Per velocizzare la fruzione dei contenuti, una volta installato **docker**, scaricate le seguenti immagini sulla vostra workstation nei giorni precedenti all'inizio del corso:
 - `docker pull aquasec/trivy`
 - `docker pull zaproxy/zap-stable:2.15.0`
-- `docker pull appsecco/dvna:sqlite`
 
 # Risorse esterne
 In questa sezione, i link agli strumenti e alle risorse esterne condivise durante la formazione.
@@ -84,14 +106,14 @@ https://github.com/OWASP/threat-dragon
 **CVSS 4.0** - https://www.first.org/cvss/calculator/4.0
 
 ## SBOM generation
-**cdxgen** - https://github.com/CycloneDX/cdxgen
+**cdxgen** - https://cdxgen.github.io/cdxgen/#/
 
 ## VEX generation
 **osv scanner** - https://github.com/google/osv-scanner  
 **trivy** - https://github.com/aquasecurity/trivy
 
-## K8s cluster KBOM and scan
-**trivy** - https://github.com/aquasecurity/trivy
+## K8s (kubernetes) cluster KBOM and scan
+**trivy** - https://trivy.dev/docs/latest/guide/target/kubernetes/  
 
 ## Continuous Security Monitoring
 **Dependency Track** - https://dependencytrack.org/

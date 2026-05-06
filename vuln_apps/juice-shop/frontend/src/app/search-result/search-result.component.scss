@@ -1,7 +1,9 @@
 /*!
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
+
+@use '../../styles/variables' as *;
 
 $bg-heading: rgba(0, 0, 0, 0.2);
 
@@ -14,29 +16,29 @@ $bg-heading: rgba(0, 0, 0, 0.2);
   background: $bg-heading;
   font-size: x-large;
   justify-content: center;
-  padding: 12px 20px;
+  padding: $space-s $space-ml;
 }
 
 .img-thumbnail {
-  width: 100%;
+  align-self: start;
+  width: 60% !important;       /* image ~60%, info-box ~40% */
 }
 
+.heading {
+  margin-bottom: $space-s;
+}
 
 .product {
+  align-items: stretch;
   cursor: pointer;
-}
-
-.btn-basket {
-  bottom: 10%;
-}
-
-mat-card {
-  height: calc(100% - 70px);
+  display: flex;               /* lay out image + info side-by-side */
+  flex-direction: row;
+  gap: $space-s;
 }
 
 .item-price {
   font-size: initial;
-  margin-top: 12px;
+  margin-top: $space-s;
   text-align: center;
 }
 
@@ -48,7 +50,7 @@ mat-card {
 .emptyState {
   display: block;
   height: auto !important;
-  margin: 20px auto;
+  margin: $space-ml auto;
   width: 50%;
 }
 
@@ -61,7 +63,7 @@ mat-card {
 
 .noResultText {
   display: block;
-  margin-top: 10px;
+  margin-top: $space-s;
   text-align: center;
 }
 
@@ -89,7 +91,7 @@ mat-card {
   color: #fff;
   display: block;
   font: 700 18px/1 'Lato', sans-serif;
-  padding: 15px 0;
+  padding: $space-m 0;
   position: absolute;
   text-align: center;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
@@ -99,6 +101,7 @@ mat-card {
 .ribbon-top-left {
   left: -10px;
   top: -10px;
+  z-index: 1;
 }
 
 .ribbon-top-left::before {
@@ -112,4 +115,60 @@ mat-card {
   right: -25px;
   top: 30px;
   transform: rotate(-45deg);
+}
+
+.img-responsive {
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+.btn-basket {
+  margin-top: $space-ml;
+}
+
+.mdc-card {
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 20px);
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+mat-card {
+  height: calc(100% - 70px);
+  width: 100%;
+}
+
+mat-grid-tile {
+  align-items: stretch;
+  height: auto !important;
+}
+
+.mat-divider.mat-divider-horizontal {
+  margin-top: $space-s;
+}
+
+.product {
+  margin-left: -$space-m;
+  margin-right: $space-xs;
+  margin-top: -$space-m;
+}
+
+
+.center-align {
+  display: flex;
+  justify-content: center;
+}
+
+
+.info-box {
+  align-self: center;
+  width: 40%;
+}
+
+.basket-btn-container {
+  display: flex;
+  justify-content: center;
 }

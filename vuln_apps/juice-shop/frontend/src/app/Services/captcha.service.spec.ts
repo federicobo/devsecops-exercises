@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { fakeAsync, inject, TestBed, tick } from '@angular/core/testing'
 
 import { CaptchaService } from './captcha.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('CaptchaService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [CaptchaService]
+      imports: [],
+      providers: [CaptchaService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     })
   })
 
@@ -30,6 +31,19 @@ describe('CaptchaService', () => {
       tick()
       expect(req.request.method).toBe('GET')
       expect(res).toBe('apiResponse')
+      httpMock.verify()
+    })
+  ))
+
+  it('should handle error when getting captcha', inject([CaptchaService, HttpTestingController],
+    fakeAsync((service: CaptchaService, httpMock: HttpTestingController) => {
+      let capturedError: any
+      service.getCaptcha().subscribe({ next: () => fail('expected error'), error: (e) => { capturedError = e } })
+      const req = httpMock.expectOne('http://localhost:3000/rest/captcha/')
+      req.error(new ErrorEvent('Request failed'), { status: 500, statusText: 'Internal Server Error' })
+
+      tick()
+      expect(capturedError.status).toBe(500)
       httpMock.verify()
     })
   ))

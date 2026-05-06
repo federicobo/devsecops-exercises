@@ -1,12 +1,13 @@
 import { TestBed, inject, fakeAsync, tick } from '@angular/core/testing'
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { VulnLinesService } from './vuln-lines.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('VulnLinesService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [VulnLinesService]
+      imports: [],
+      providers: [VulnLinesService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     })
   })
 
@@ -25,6 +26,19 @@ describe('VulnLinesService', () => {
       expect(req.request.method).toBe('POST')
       expect(req.request.body).toEqual({ key: 'testChallenge', selectedLines: [1, 2] })
       expect(res).toBe('apiResponse')
+      httpMock.verify()
+    })
+  ))
+
+  it('should handle error when submitting solution', inject([VulnLinesService, HttpTestingController],
+    fakeAsync((service: VulnLinesService, httpMock: HttpTestingController) => {
+      let capturedError: any
+      service.check('key', [3, 4]).subscribe({ next: () => fail('expected error'), error: (e) => { capturedError = e } })
+      const req = httpMock.expectOne('http://localhost:3000/snippets/verdict')
+      req.error(new ErrorEvent('Request failed'), { status: 400, statusText: 'Bad Request' })
+
+      tick()
+      expect(capturedError.status).toBe(400)
       httpMock.verify()
     })
   ))

@@ -8,7 +8,6 @@ application:
     showOnFirstStart: false
 challenges:
   showHints: false
-  showFeedbackButtons: false
 hackingInstructor:
   isEnabled: false
 ctf:
@@ -333,3 +332,18 @@ ctf:
     web3SandboxChallenge:
       name: France
       code: FR
+    csafChallenge:
+      name: Slovenia
+      code: SI
+    exposedCredentialsChallenge:
+      name: Montenegro
+      code: ME
+    yamlBombChallenge:
+      name: Eswatini
+      code: SZ
+    leakedApiKeyChallenge:
+      name: San Marino
+      code: SM
+    passwordHashLeakChallenge:
+      name: Italy
+      code: IT

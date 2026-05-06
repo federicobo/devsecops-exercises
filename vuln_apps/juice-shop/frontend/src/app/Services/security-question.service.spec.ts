@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { fakeAsync, inject, TestBed, tick } from '@angular/core/testing'
 
 import { SecurityQuestionService } from './security-question.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('SecurityQuestionService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [SecurityQuestionService]
+      imports: [],
+      providers: [SecurityQuestionService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     })
   })
 
@@ -45,6 +46,19 @@ describe('SecurityQuestionService', () => {
 
       expect(req.request.method).toBe('GET')
       expect(res).toBe('apiResponse')
+      httpMock.verify()
+    })
+  ))
+
+  it('should handle error when getting security question by user email', inject([SecurityQuestionService, HttpTestingController],
+    fakeAsync((service: SecurityQuestionService, httpMock: HttpTestingController) => {
+      let capturedError: any
+      service.findBy('e@x.ample').subscribe({ next: () => fail('expected error'), error: (e) => { capturedError = e } })
+      const req = httpMock.expectOne('http://localhost:3000/rest/user/security-question?email=e@x.ample')
+      req.error(new ErrorEvent('Request failed'), { status: 404, statusText: 'Not Found' })
+
+      tick()
+      expect(capturedError.status).toBe(404)
       httpMock.verify()
     })
   ))

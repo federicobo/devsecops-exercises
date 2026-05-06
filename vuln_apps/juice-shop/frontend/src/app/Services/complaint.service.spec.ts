@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { fakeAsync, inject, TestBed, tick } from '@angular/core/testing'
 
 import { ComplaintService } from './complaint.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('ComplaintService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ComplaintService]
+      imports: [],
+      providers: [ComplaintService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     })
   })
 
@@ -31,6 +32,20 @@ describe('ComplaintService', () => {
       expect(req.request.method).toBe('POST')
       expect(req.request.body).toBeNull()
       expect(res).toBe('apiResponse')
+      httpMock.verify()
+    })
+  ))
+
+  it('should handle error when creating complaint', inject([ComplaintService, HttpTestingController],
+    fakeAsync((service: ComplaintService, httpMock: HttpTestingController) => {
+      let capturedError: any
+      service.save({ foo: 'bar' }).subscribe({ next: () => {}, error: (e) => { capturedError = e } })
+      const req = httpMock.expectOne('http://localhost:3000/api/Complaints/')
+      req.flush(null, { status: 400, statusText: 'Bad Request' })
+
+      tick()
+      expect(capturedError).toBeTruthy()
+      expect(capturedError.status).toBe(400)
       httpMock.verify()
     })
   ))

@@ -1,17 +1,18 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { fakeAsync, inject, TestBed, tick } from '@angular/core/testing'
 import { WalletService } from './wallet.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('WalletService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [WalletService]
+      imports: [],
+      providers: [WalletService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     })
   })
 
@@ -41,6 +42,32 @@ describe('WalletService', () => {
       tick()
       expect(req.request.method).toBe('PUT')
       expect(res).toBe('apiResponse')
+      httpMock.verify()
+    })
+  ))
+
+  it('should handle error when getting wallet balance', inject([WalletService, HttpTestingController],
+    fakeAsync((service: WalletService, httpMock: HttpTestingController) => {
+      let capturedError: any
+      service.get().subscribe({ next: () => fail('expected error'), error: (e) => { capturedError = e } })
+      const req = httpMock.expectOne('http://localhost:3000/rest/wallet/balance')
+      req.error(new ErrorEvent('Request failed'), { status: 500, statusText: 'Internal Server Error' })
+
+      tick()
+      expect(capturedError.status).toBe(500)
+      httpMock.verify()
+    })
+  ))
+
+  it('should handle error when updating wallet balance', inject([WalletService, HttpTestingController],
+    fakeAsync((service: WalletService, httpMock: HttpTestingController) => {
+      let capturedError: any
+      service.put({ amount: 1 }).subscribe({ next: () => fail('expected error'), error: (e) => { capturedError = e } })
+      const req = httpMock.expectOne('http://localhost:3000/rest/wallet/balance')
+      req.error(new ErrorEvent('Bad Request'), { status: 400, statusText: 'Bad Request' })
+
+      tick()
+      expect(capturedError.status).toBe(400)
       httpMock.verify()
     })
   ))

@@ -10,34 +10,46 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        prj_folder: ["dvna", "vulnado"]
+        project: ["webgoat", "juice-shop"]
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
       - name: Login to Docker Hub
         id: docker-login
-        uses: docker/login-action@v3
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      - name: Setup Java 25
+        if: matrix.project == 'webgoat'
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
+        with:
+          java-version: 25
+          distribution: temurin
+
+      - name: Compile project
+        if: matrix.project == 'webgoat'
+        working-directory: vuln_apps/webgoat
+        run: mvn -B clean package -DskipTests
+
       - name: Build Docker image
         id: build-image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
-          context: "${{ github.workspace }}/vuln_apps/${{ matrix.prj_folder }}"
+          context: "${{ github.workspace }}/vuln_apps/${{ matrix.project }}"
           push: false
           load: true
-          tags: ${{ matrix.prj_folder }}:latest
+          tags: ${{ matrix.project }}:latest
 
       - name: Docker Scout CVEs
-        uses: docker/scout-action@v1
+        uses: docker/scout-action@bacf462e8d090c09660de30a6ccc718035f961e3 # v1.0.2
         with:
           command: cves
-          image: local://${{ matrix.prj_folder }}:latest
-          sarif-file: ${{ matrix.prj_folder }}-cves.json
+          image: local://${{ matrix.project }}:latest
+          sarif-file: ${{ matrix.project }}-cves.json

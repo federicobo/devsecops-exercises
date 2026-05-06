@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import { ClipboardModule } from 'ngx-clipboard'
 import { MatButtonModule } from '@angular/material/button'
 import { MatCardModule } from '@angular/material/card'
 import { CountryMappingService } from '../Services/country-mapping.service'
-import { CookieModule, CookieService } from 'ngx-cookie'
+import { CookieModule, CookieService } from 'ngy-cookie'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { ChallengeService } from '../Services/challenge.service'
 import { ConfigurationService } from '../Services/configuration.service'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { SnackBarHelperService } from '../Services/snack-bar-helper.service'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { type ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing'
 import { SocketIoService } from '../Services/socket-io.service'
 
@@ -19,13 +19,14 @@ import { ChallengeSolvedNotificationComponent } from './challenge-solved-notific
 import { of, throwError } from 'rxjs'
 import { EventEmitter } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 class MockSocket {
   on (str: string, callback: any) {
-    callback()
+    callback(str)
   }
 
-  emit (a: any, b: any) {
+  emit () {
     return null
   }
 }
@@ -38,6 +39,8 @@ describe('ChallengeSolvedNotificationComponent', () => {
   let cookieService: any
   let challengeService: any
   let configurationService: any
+  let countryMappingService: any
+  let snackBarHelperService: any
   let mockSocket: any
 
   beforeEach(waitForAsync(() => {
@@ -50,28 +53,31 @@ describe('ChallengeSolvedNotificationComponent', () => {
     translateService.onTranslationChange = new EventEmitter()
     translateService.onDefaultLangChange = new EventEmitter()
     cookieService = jasmine.createSpyObj('CookieService', ['put'])
-    challengeService = jasmine.createSpyObj('ChallengeService', ['continueCode'])
+    challengeService = jasmine.createSpyObj('ChallengeService', ['continueCode', 'find'])
+    challengeService.find.and.returnValue(of([]))
     configurationService = jasmine.createSpyObj('ConfigurationService', ['getApplicationConfiguration'])
     configurationService.getApplicationConfiguration.and.returnValue(of({}))
+    countryMappingService = jasmine.createSpyObj('CountryMappingService', ['getCountryMapping'])
+    countryMappingService.getCountryMapping.and.returnValue(of({}))
+    snackBarHelperService = jasmine.createSpyObj('SnackBarHelperService', ['open'])
 
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        TranslateModule.forRoot(),
+      imports: [TranslateModule.forRoot(),
         CookieModule.forRoot(),
-        ClipboardModule,
         MatCardModule,
         MatButtonModule,
-        MatIconModule
-      ],
-      declarations: [ChallengeSolvedNotificationComponent],
+        MatIconModule,
+        ChallengeSolvedNotificationComponent],
       providers: [
         { provide: SocketIoService, useValue: socketIoService },
         { provide: TranslateService, useValue: translateService },
         { provide: CookieService, useValue: cookieService },
         { provide: ChallengeService, useValue: challengeService },
         { provide: ConfigurationService, useValue: configurationService },
-        CountryMappingService
+        { provide: CountryMappingService, useValue: countryMappingService },
+        { provide: SnackBarHelperService, useValue: snackBarHelperService },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
       ]
     })
       .compileComponents()
@@ -89,18 +95,18 @@ describe('ChallengeSolvedNotificationComponent', () => {
 
   it('should delete notifictions', () => {
     component.notifications = [
-      { message: 'foo', flag: '1234', copied: false },
-      { message: 'bar', flag: '5678', copied: false }
+      { key: 'foo', message: 'foo', flag: '1234', copied: false },
+      { key: 'bar', message: 'bar', flag: '5678', copied: false }
     ]
     component.closeNotification(0)
 
-    expect(component.notifications).toEqual([{ message: 'bar', flag: '5678', copied: false }])
+    expect(component.notifications).toEqual([{ key: 'bar', message: 'bar', flag: '5678', copied: false }])
   })
 
   it('should delete all notifications if the shiftKey was pressed', () => {
     component.notifications = [
-      { message: 'foo', flag: '1234', copied: false },
-      { message: 'bar', flag: '5678', copied: false }
+      { key: 'foo', message: 'foo', flag: '1234', copied: false },
+      { key: 'bar', message: 'bar', flag: '5678', copied: false }
     ]
     component.closeNotification(0, true)
 
@@ -110,11 +116,11 @@ describe('ChallengeSolvedNotificationComponent', () => {
   it('should add new notification', fakeAsync(() => {
     translateService.get.and.returnValue(of('CHALLENGE_SOLVED'))
     component.notifications = []
-    component.showNotification({ challenge: 'Test', flag: '1234' })
+    component.showNotification({ key: 'test', challenge: 'Test', flag: '1234' })
     tick()
 
     expect(translateService.get).toHaveBeenCalledWith('CHALLENGE_SOLVED', { challenge: 'Test' })
-    expect(component.notifications).toEqual([{ message: 'CHALLENGE_SOLVED', flag: '1234', copied: false, country: undefined }])
+    expect(component.notifications).toEqual([{ key: 'test', message: 'CHALLENGE_SOLVED', flag: '1234', copied: false, country: undefined, codingChallenge: false }])
   }))
 
   it('should store retrieved continue code as cookie for 1 year', () => {
@@ -124,7 +130,14 @@ describe('ChallengeSolvedNotificationComponent', () => {
     component.saveProgress()
     expires.setFullYear(expires.getFullYear() + 1)
 
-    expect(cookieService.put).toHaveBeenCalledWith('continueCode', '12345', { expires })
+    expect(cookieService.put).toHaveBeenCalledWith('continueCode', '12345', jasmine.objectContaining({ expires: jasmine.any(Date) }))
+    const callArgs = cookieService.put.calls.mostRecent().args
+    expect(callArgs[2].expires.getFullYear()).toBe(expires.getFullYear())
+    expect(callArgs[2].expires.getMonth()).toBe(expires.getMonth())
+    expect(callArgs[2].expires.getDate()).toBe(expires.getDate())
+    expect(callArgs[2].expires.getHours()).toBe(expires.getHours())
+    expect(callArgs[2].expires.getMinutes()).toBe(expires.getMinutes())
+    expect(callArgs[2].expires.getSeconds()).toBe(expires.getSeconds())
   })
 
   it('should throw error when not supplied with a valid continue code', () => {
@@ -176,5 +189,51 @@ describe('ChallengeSolvedNotificationComponent', () => {
 
     expect(component.showCtfCountryDetailsInNotifications).toBe('none')
     expect(component.countryMap).toBeUndefined()
+  })
+
+  it('should load countries for FBCTF when configured to show country details', () => {
+    configurationService.getApplicationConfiguration.and.returnValue(of({ ctf: { showCountryDetailsInNotifications: 'both' } }))
+    countryMappingService.getCountryMapping.and.returnValue(of({ scoreBoardChallenge: { name: 'Canada', code: 'CA' }, errorHandlingChallenge: { name: 'Austria', code:'AT' }}))
+    component.ngOnInit()
+
+    expect(component.showCtfCountryDetailsInNotifications).toBe('both')
+    expect(component.countryMap).toEqual({ scoreBoardChallenge: { name: 'Canada', code: 'CA' }, errorHandlingChallenge: { name: 'Austria', code:'AT' }})
+  })
+
+  it('should show mapped country for FBCTF when configured accordingly', fakeAsync(() => {
+    translateService.get.and.returnValue(of('CHALLENGE_SOLVED'))
+    configurationService.getApplicationConfiguration.and.returnValue(of({ ctf: { showCountryDetailsInNotifications: 'both' } }))
+    countryMappingService.getCountryMapping.and.returnValue(of({ test: { name: 'Canada', code: 'CA' }}))
+    component.ngOnInit()
+    component.notifications = []
+    component.showNotification({ key: 'test', challenge: 'Test', flag: '1234' })
+    tick()
+
+    expect(component.notifications).toEqual([{ key: 'test', message: 'CHALLENGE_SOLVED', flag: '1234', copied: false, country: { name: 'Canada', code: 'CA' }, codingChallenge: false }])
+  }))
+
+  it('should copy text to clipboard when navigator.clipboard is available', fakeAsync(() => {
+    const mockClipboard = {
+      writeText: jasmine.createSpy('writeText').and.returnValue(Promise.resolve())
+    }
+    Object.defineProperty(navigator, 'clipboard', {
+      value: mockClipboard,
+      writable: true
+    })
+    component.copyToClipboard('test-flag-123')
+    tick()
+
+    expect(mockClipboard.writeText).toHaveBeenCalledWith('test-flag-123')
+    expect(snackBarHelperService.open).toHaveBeenCalledWith('COPY_SUCCESS', 'confirmBar')
+  }))
+
+  it('should not attempt to copy when navigator.clipboard is unavailable', () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      value: undefined,
+      writable: true
+    })
+    component.copyToClipboard('test-flag-123')
+
+    expect(snackBarHelperService.open).not.toHaveBeenCalled()
   })
 })

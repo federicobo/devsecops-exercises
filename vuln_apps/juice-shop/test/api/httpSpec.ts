@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import frisby = require('frisby')
+import * as frisby from 'frisby'
 import config from 'config'
 
 const URL = 'http://localhost:3000'
@@ -37,5 +37,11 @@ describe('HTTP', () => {
     return frisby.get(URL)
       .expect('status', 200)
       .expectNot('header', 'X-XSS-Protection')
+  })
+
+  it('unexpected path under known sub-path caught by generic error handler', () => {
+    return frisby.get(URL + '/rest/x')
+      .expect('status', 500)
+      .expect('bodyContains', '<title>Error: Unexpected path: /rest/x</title>')
   })
 })

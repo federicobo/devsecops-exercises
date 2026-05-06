@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import { CookieModule, CookieService } from 'ngx-cookie'
-import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { CookieModule, CookieService } from 'ngy-cookie'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatCardModule } from '@angular/material/card'
@@ -16,6 +16,7 @@ import { SocketIoService } from '../Services/socket-io.service'
 import { of, throwError } from 'rxjs'
 import { EventEmitter } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 class MockSocket {
   on (str: string, callback: any) {
@@ -33,8 +34,10 @@ describe('ServerStartedNotificationComponent', () => {
   let mockSocket: any
 
   beforeEach(waitForAsync(() => {
-    challengeService = jasmine.createSpyObj('ChallengeService', ['restoreProgress'])
+    challengeService = jasmine.createSpyObj('ChallengeService', ['restoreProgress', 'restoreProgressFindIt', 'restoreProgressFixIt'])
     challengeService.restoreProgress.and.returnValue(of({}))
+    challengeService.restoreProgressFindIt.and.returnValue(of({}))
+    challengeService.restoreProgressFixIt.and.returnValue(of({}))
     translateService = jasmine.createSpyObj('TranslateService', ['get'])
     translateService.get.and.returnValue(of({}))
     translateService.onLangChange = new EventEmitter()
@@ -45,20 +48,19 @@ describe('ServerStartedNotificationComponent', () => {
     socketIoService.socket.and.returnValue(mockSocket)
 
     TestBed.configureTestingModule({
-      imports: [
-        TranslateModule.forRoot(),
+      imports: [TranslateModule.forRoot(),
         CookieModule.forRoot(),
-        HttpClientTestingModule,
         MatCardModule,
         MatButtonModule,
-        MatIconModule
-      ],
-      declarations: [ServerStartedNotificationComponent],
+        MatIconModule,
+        ServerStartedNotificationComponent],
       providers: [
         { provide: ChallengeService, useValue: challengeService },
         { provide: TranslateService, useValue: translateService },
         { provide: SocketIoService, useValue: socketIoService },
-        CookieService
+        CookieService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
       ]
     })
       .compileComponents()

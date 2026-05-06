@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import frisby = require('frisby')
+import * as frisby from 'frisby'
 import { expect } from '@jest/globals'
-const security = require('../../lib/insecurity')
+import * as security from '../../lib/insecurity'
 
 const API_URL = 'http://localhost:3000/api'
 const REST_URL = 'http://localhost:3000/rest'
@@ -52,6 +52,16 @@ describe('/rest/basket/:id', () => {
       .then(({ json }) => {
         expect(json.data.Products.length).toBe(3)
       })
+  })
+
+  // todo: Endpoint should return a 200, but returns a 401 right now, even though the challenges are marked as solved...
+  it.skip('GET basket should accept forged JWTs', () => {
+    const header = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url')
+    const payload = Buffer.from(JSON.stringify({ data: { email: 'jim@juice-sh.op' }, iat: 1508639612, exp: 9999999999 })).toString('base64url')
+    const unsignedToken = `${header}.${payload}.`
+    return frisby.get(REST_URL + '/basket/1', { headers: { Authorization: 'Bearer ' + unsignedToken, 'content-type': 'application/json' } })
+      .expect('status', 200)
+      .expect('header', 'content-type', /application\/json/)
   })
 })
 

@@ -1,17 +1,18 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
 import { fakeAsync, inject, TestBed, tick } from '@angular/core/testing'
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { ConfigurationService } from './configuration.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('ConfigurationService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ConfigurationService]
+      imports: [],
+      providers: [ConfigurationService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     })
   })
 
@@ -47,18 +48,15 @@ describe('ConfigurationService', () => {
   it('should throw an error on recieving an error from the server',
     inject([ConfigurationService, HttpTestingController],
       fakeAsync((service: ConfigurationService, httpMock: HttpTestingController) => {
-        let res: any
-        service.getApplicationConfiguration().subscribe(data => {
-          console.log(data)
-        }, (err) => (res = err))
+        let capturedError: any
+        service.getApplicationConfiguration().subscribe({ next: () => {}, error: (err) => (capturedError = err) })
         const req = httpMock.expectOne('http://localhost:3000/rest/admin/application-configuration')
         req.error(new ErrorEvent('Request failed'), { status: 404, statusText: 'Request failed' })
         tick()
 
-        const error = res
-        expect(service.getApplicationConfiguration).toThrow()
-        expect(error.status).toBe(404)
-        expect(error.statusText).toBe('Request failed')
+        expect(capturedError).toBeTruthy()
+        expect(capturedError.status).toBe(404)
+        expect(capturedError.statusText).toBe('Request failed')
         httpMock.verify()
       })
     ))

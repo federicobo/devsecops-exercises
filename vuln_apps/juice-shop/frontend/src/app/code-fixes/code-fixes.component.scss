@@ -1,3 +1,6 @@
-#code {
-  width: 63em;
+@use '../../styles/variables' as *;
+
+:host {
+  display: block;
+  padding-top: $space-m;
 }

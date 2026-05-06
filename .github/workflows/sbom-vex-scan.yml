@@ -3,6 +3,8 @@ name: SBOM/VEX generation
 on:
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   sbom-vex-scan:
@@ -11,16 +13,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [ "dvna", "vulnado" ]
+        project: [ "webgoat", "juice-shop" ]
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Generate VEXs (Human)
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           scan-type: fs
+          scanners: vuln
           format: table
           output: ${{ matrix.project }}.vex
           scan-ref: ./vuln_apps/${{ matrix.project }}
@@ -28,9 +31,24 @@ jobs:
           TRIVY_DB_REPOSITORY: "ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db"
           TRIVY_JAVA_DB_REPOSITORY: "ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db"
 
+      - name: Run Trivy (SARIF per GitHub Security)
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        with:
+          scan-type: fs
+          scanners: vuln
+          format: sarif
+          output:  ${{ matrix.project }}.sarif
+          scan-ref: ./vuln_apps/${{ matrix.project }}
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
+        if: always()
+        with:
+          sarif_file: ${{ matrix.project }}.sarif
+
       - name: Upload results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: vex-${{ matrix.project }}
           path: ${{ matrix.project }}.vex

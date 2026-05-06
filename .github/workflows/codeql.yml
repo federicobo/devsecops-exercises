@@ -29,29 +29,35 @@ jobs:
     steps:
       # Checkout the repo, this will setup the pipeline with our actual codebase
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       # Setup CodeQL tool, with this setup step, we are specifying the language of the scan, and also some extra arguments in a configuration file
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
         with:
           config-file: ./.github/codeql/codeql-config.${{ matrix.language }}.yml
           languages: ${{ matrix.language }}
 
       # Build the codebase, codeql offer an autobuild steps for most of his supported languages: https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
-      - if: matrix.language != 'java-kotlin'
-        name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+      - name: Autobuild
+        if: matrix.language != 'java-kotlin'
+        uses: github/codeql-action/autobuild@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
 
-      # In case our java project, we are leveraging some project specific needs
-      - if: matrix.language == 'java-kotlin'
-        name: Compile project
-        run: |
-          cd vuln_apps/vulnado
-          ./mvnw -B clean package -DskipTests=true
+      # In case of java project, we are leveraging some project specific needs
+      - name: Setup Java 25
+        if: matrix.language == 'java-kotlin'
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
+        with:
+          java-version: 25
+          distribution: temurin
+
+      - name: Compile project
+        if: matrix.language == 'java-kotlin'
+        working-directory: vuln_apps/webgoat
+        run: mvn -B clean package -DskipTests
 
       # Perform the actual code analysis, that will automatic upload GitHub security section
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
         with:
           category: "/language:${{matrix.language}}"

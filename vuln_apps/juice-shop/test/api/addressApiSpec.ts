@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import frisby = require('frisby')
+import * as frisby from 'frisby'
 
 const API_URL = 'http://localhost:3000/api'
 const REST_URL = 'http://localhost:3000/rest'
@@ -141,6 +141,13 @@ describe('/api/Addresss/:id', () => {
       .expect('status', 200)
   })
 
+  it('GET address by non-existing id returns 400 for authorized user', () => {
+    const nonExistingId = 999999
+    return frisby.get(API_URL + '/Addresss/' + nonExistingId, { headers: authHeader })
+      .expect('status', 400)
+      .expect('json', { status: 'error', data: 'Malicious activity detected.' })
+  })
+
   it('PUT update address by id', () => {
     return frisby.put(API_URL + '/Addresss/' + addressId, {
       headers: authHeader,
@@ -175,5 +182,11 @@ describe('/api/Addresss/:id', () => {
   it('DELETE address by id', () => {
     return frisby.del(API_URL + '/Addresss/' + addressId, { headers: authHeader })
       .expect('status', 200)
+  })
+
+  it('DELETE address by id again returns 400 for authorized user', () => {
+    return frisby.del(API_URL + '/Addresss/' + addressId, { headers: authHeader })
+      .expect('status', 400)
+      .expect('json', { status: 'error', data: 'Malicious activity detected.' })
   })
 })

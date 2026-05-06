@@ -1,5 +1,6 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing'
 import { TranslateModule } from '@ngx-translate/core'
+import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs'
 
 import { CodeAreaComponent } from './code-area.component'
 
@@ -10,9 +11,20 @@ describe('CodeAreaComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        TranslateModule.forRoot()
+        TranslateModule.forRoot(),
+        CodeAreaComponent
       ],
-      declarations: [CodeAreaComponent]
+      providers: [
+        {
+          provide: HIGHLIGHT_OPTIONS,
+          useValue: {
+            coreLibraryLoader: async () => await import('highlight.js/lib/core'),
+            languages: {
+              typescript: async () => await import('highlight.js/lib/languages/typescript')
+            }
+          }
+        }
+      ]
     })
       .compileComponents()
   })

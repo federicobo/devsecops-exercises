@@ -1,17 +1,18 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { fakeAsync, inject, TestBed, tick } from '@angular/core/testing'
 import { AddressService } from './address.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('AddressService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [AddressService]
+      imports: [],
+      providers: [AddressService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     })
   })
 
@@ -80,6 +81,32 @@ describe('AddressService', () => {
       tick()
       expect(req.request.method).toBe('DELETE')
       expect(res).toBe('apiResponse')
+      httpMock.verify()
+    })
+  ))
+
+  it('should handle error when getting a single address', inject([AddressService, HttpTestingController],
+    fakeAsync((service: AddressService, httpMock: HttpTestingController) => {
+      let capturedError: any
+      service.getById(1).subscribe({ next: () => fail('expected error'), error: (e) => { capturedError = e } })
+      const req = httpMock.expectOne('http://localhost:3000/api/Addresss/1')
+      req.error(new ErrorEvent('Not Found'), { status: 404, statusText: 'Not Found' })
+
+      tick()
+      expect(capturedError.status).toBe(404)
+      httpMock.verify()
+    })
+  ))
+
+  it('should handle error when getting addresses', inject([AddressService, HttpTestingController],
+    fakeAsync((service: AddressService, httpMock: HttpTestingController) => {
+      let capturedError: any
+      service.get().subscribe({ next: () => fail('expected error'), error: (e) => { capturedError = e } })
+      const req = httpMock.expectOne('http://localhost:3000/api/Addresss')
+      req.error(new ErrorEvent('Internal Server Error'), { status: 500, statusText: 'Internal Server Error' })
+
+      tick()
+      expect(capturedError.status).toBe(500)
       httpMock.verify()
     })
   ))

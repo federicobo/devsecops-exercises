@@ -1,17 +1,18 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { fakeAsync, inject, TestBed, tick } from '@angular/core/testing'
 
 import { LanguagesService } from './languages.service'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('LanguagesService', () => {
   beforeEach(() => TestBed.configureTestingModule({
-    imports: [HttpClientTestingModule],
-    providers: [LanguagesService]
+    imports: [],
+    providers: [LanguagesService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
   }))
 
   it('should be created', () => {
@@ -32,6 +33,20 @@ describe('LanguagesService', () => {
       expect(req.request.method).toBe('GET')
       expect(res).toBe('apiResponse')
 
+      httpMock.verify()
+    })
+  ))
+
+  it('should handle error when getting the language list', inject([LanguagesService, HttpTestingController],
+    fakeAsync((service: LanguagesService, httpMock: HttpTestingController) => {
+      let capturedError: any
+      service.getLanguages().subscribe({ next: () => {}, error: (e) => { capturedError = e } })
+      const req = httpMock.expectOne('http://localhost:3000/rest/languages')
+      req.flush(null, { status: 503, statusText: 'Service Unavailable' })
+
+      tick()
+      expect(capturedError).toBeTruthy()
+      expect(capturedError.status).toBe(503)
       httpMock.verify()
     })
   ))

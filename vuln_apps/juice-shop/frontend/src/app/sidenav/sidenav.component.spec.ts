@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
@@ -9,9 +9,9 @@ import { SocketIoService } from '../Services/socket-io.service'
 import { ConfigurationService } from '../Services/configuration.service'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { RouterTestingModule } from '@angular/router/testing'
-import { of } from 'rxjs'
-import { HttpClientModule } from '@angular/common/http'
-import { CookieModule, CookieService } from 'ngx-cookie'
+import { of, throwError } from 'rxjs'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { CookieModule, CookieService } from 'ngy-cookie'
 import { LoginGuard } from '../app.guard'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { SidenavComponent } from './sidenav.component'
@@ -65,10 +65,7 @@ describe('SidenavComponent', () => {
     loginGuard.tokenDecode.and.returnValue({})
 
     TestBed.configureTestingModule({
-      declarations: [SidenavComponent],
-      imports: [
-        HttpClientModule,
-        TranslateModule.forRoot(),
+      imports: [TranslateModule.forRoot(),
         BrowserAnimationsModule,
         MatToolbarModule,
         MatIconModule,
@@ -76,8 +73,8 @@ describe('SidenavComponent', () => {
         MatMenuModule,
         MatListModule,
         CookieModule.forRoot(),
-        RouterTestingModule
-      ],
+        RouterTestingModule,
+        SidenavComponent],
       providers: [
         { provide: ConfigurationService, useValue: configurationService },
         { provide: ChallengeService, useValue: challengeService },
@@ -86,12 +83,12 @@ describe('SidenavComponent', () => {
         { provide: CookieService, useValue: cookieService },
         { provide: SocketIoService, useValue: socketIoService },
         { provide: LoginGuard, useValue: loginGuard },
-        TranslateService
+        TranslateService,
+        provideHttpClient(withInterceptorsFromDi())
       ]
     })
       .compileComponents()
     location = TestBed.inject(Location)
-    TestBed.inject(TranslateService)
   }))
 
   beforeEach(() => {
@@ -175,4 +172,26 @@ describe('SidenavComponent', () => {
     tick()
     expect(location.path()).toBe('/')
   }))
+
+  it('should handle error when getting scoreboard status', fakeAsync(() => {
+    challengeService.find.and.returnValue(throwError('Error'))
+    console.log = jasmine.createSpy('log')
+    component.getScoreBoardStatus()
+    expect(console.log).toHaveBeenCalledWith('Error')
+  }))
+
+  it('should handle error when getting user details', fakeAsync(() => {
+    userService.whoAmI.and.returnValue(throwError('Error'))
+    console.log = jasmine.createSpy('log')
+    component.getUserDetails()
+    expect(console.log).toHaveBeenCalledWith('Error')
+  }))
+
+  it('should handle error when getting application details', fakeAsync(() => {
+    configurationService.getApplicationConfiguration.and.returnValue(throwError('Error'))
+    console.log = jasmine.createSpy('log')
+    component.getApplicationDetails()
+    expect(console.log).toHaveBeenCalledWith('Error')
+  }))
+
 })

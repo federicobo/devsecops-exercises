@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2023 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
-import frisby = require('frisby')
+import * as frisby from 'frisby'
 import config from 'config'
 
 const jsonHeader = { 'content-type': 'application/json' }
@@ -31,7 +31,7 @@ describe('/rest/deluxe-membership', () => {
     return frisby.post(REST_URL + '/user/login', {
       headers: jsonHeader,
       body: {
-        email: 'bender@' + config.get('application.domain'),
+        email: 'bender@' + config.get<string>('application.domain'),
         password: 'OhG0dPlease1nsertLiquor!'
       }
     })
@@ -49,7 +49,7 @@ describe('/rest/deluxe-membership', () => {
     return frisby.post(REST_URL + '/user/login', {
       headers: jsonHeader,
       body: {
-        email: 'ciso@' + config.get('application.domain'),
+        email: 'ciso@' + config.get<string>('application.domain'),
         password: 'mDLx?94T~1CfVfZMzw@sJ9f?s3L6lbMqE70FfI8^54jbNikY5fymx7c!YbJb'
       }
     })
@@ -67,7 +67,7 @@ describe('/rest/deluxe-membership', () => {
     return frisby.post(REST_URL + '/user/login', {
       headers: jsonHeader,
       body: {
-        email: 'admin@' + config.get('application.domain'),
+        email: 'admin@' + config.get<string>('application.domain'),
         password: 'admin123'
       }
     })
@@ -85,7 +85,7 @@ describe('/rest/deluxe-membership', () => {
     return frisby.post(REST_URL + '/user/login', {
       headers: jsonHeader,
       body: {
-        email: 'accountant@' + config.get('application.domain'),
+        email: 'accountant@' + config.get<string>('application.domain'),
         password: 'i am an awesome accountant'
       }
     })
@@ -99,9 +99,9 @@ describe('/rest/deluxe-membership', () => {
       })
   })
 
-  it('POST upgrade deluxe membership status for customers', async () => {
+  it('POST upgrade deluxe membership status for customers with card payment', async () => {
     const { token } = await login({
-      email: `bender@${config.get('application.domain')}`,
+      email: `bender@${config.get<string>('application.domain')}`,
       password: 'OhG0dPlease1nsertLiquor!'
     })
 
@@ -123,9 +123,43 @@ describe('/rest/deluxe-membership', () => {
       .promise()
   })
 
+  it('POST upgrade deluxe membership status for customers with wallet payment', async () => {
+    const { token } = await login({
+      email: `mc.safesearch@${config.get<string>('application.domain')}`,
+      password: 'Mr. N00dles'
+    })
+
+    await frisby.post(REST_URL + '/deluxe-membership', {
+      headers: { Authorization: 'Bearer ' + token, 'content-type': 'application/json' },
+      body: {
+        paymentMode: 'wallet'
+      }
+    })
+      .expect('status', 200)
+      .expect('json', 'status', 'success')
+      .promise()
+  })
+
+  it('POST upgrade deluxe membership fails for customers with insufficient wallet balance', async () => {
+    const { token } = await login({
+      email: `amy@${config.get<string>('application.domain')}`,
+      password: 'K1f.....................'
+    })
+
+    await frisby.post(REST_URL + '/deluxe-membership', {
+      headers: { Authorization: 'Bearer ' + token, 'content-type': 'application/json' },
+      body: {
+        paymentMode: 'wallet'
+      }
+    })
+      .expect('status', 400)
+      .expect('json', 'error', 'Insuffienct funds in Wallet')
+      .promise()
+  })
+
   it('POST deluxe membership status with wrong card id throws error', async () => {
     const { token } = await login({
-      email: `jim@${config.get('application.domain')}`,
+      email: `jim@${config.get<string>('application.domain')}`,
       password: 'ncc-1701'
     })
 
@@ -145,7 +179,7 @@ describe('/rest/deluxe-membership', () => {
     return frisby.post(REST_URL + '/user/login', {
       headers: jsonHeader,
       body: {
-        email: 'ciso@' + config.get('application.domain'),
+        email: 'ciso@' + config.get<string>('application.domain'),
         password: 'mDLx?94T~1CfVfZMzw@sJ9f?s3L6lbMqE70FfI8^54jbNikY5fymx7c!YbJb'
       }
     })
@@ -166,7 +200,7 @@ describe('/rest/deluxe-membership', () => {
     return frisby.post(REST_URL + '/user/login', {
       headers: jsonHeader,
       body: {
-        email: 'admin@' + config.get('application.domain'),
+        email: 'admin@' + config.get<string>('application.domain'),
         password: 'admin123'
       }
     })
@@ -187,7 +221,7 @@ describe('/rest/deluxe-membership', () => {
     return frisby.post(REST_URL + '/user/login', {
       headers: jsonHeader,
       body: {
-        email: 'accountant@' + config.get('application.domain'),
+        email: 'accountant@' + config.get<string>('application.domain'),
         password: 'i am an awesome accountant'
       }
     })

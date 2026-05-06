@@ -19,6 +19,11 @@
   /* Challenges: GET list of challenges allowed. Everything else forbidden entirely */
   app.post('/api/Challenges', security.denyAll())
   app.use('/api/Challenges/:id', security.denyAll())
+  /* Hints: GET and PUT hints allowed. Everything else forbidden */
+  app.post('/api/Hints', security.denyAll())
+  app.route('/api/Hints/:id')
+    .get(security.denyAll())
+    .delete(security.denyAll())
   /* Complaints: POST and GET allowed when logged in only */
   app.get('/api/Complaints', security.isAuthorized())
   app.post('/api/Complaints', security.isAuthorized())
@@ -48,7 +53,7 @@
   /* Accounting users are allowed to check and update quantities */
   app.delete('/api/Quantitys/:id', security.denyAll())
   app.post('/api/Quantitys', security.denyAll())
-  app.use('/api/Quantitys/:id', security.isAccounting(), ipfilter(['123.456.789'], { mode: 'allow' }))
+  app.use('/api/Quantitys/:id', security.isAccounting(), IpFilter(['123.456.789'], { mode: 'allow' }))
   /* Feedbacks: Do not allow changes of existing feedback */
   app.put('/api/Feedbacks/:id', security.denyAll())
   /* PrivacyRequests: Only allowed for authenticated users */
