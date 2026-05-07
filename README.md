@@ -94,8 +94,8 @@ https://docs.docker.com/engine/install/
 
 
 To speed up access to the content, once you have installed **Docker**, download the following images to your workstation a few days before the course begins:
-- `docker pull aquasec/trivy:0.70.0`
-- `docker pull zaproxy/zap-stable:2.17.0`
+- `docker pull aquasec/trivy@sha256:be1190afcb28352bfddc4ddeb71470835d16462af68d310f9f4bca710961a41e` (0.70.0)
+- `docker pull zaproxy/zap-stable@sha256:4f67b3e798fd4e23649265eac9ad84a67e883850c96691fc1743b2a6e1cc7ed0` (2.17.0)
 
 # External resources
 In this section, you'll find links to the tools and external resources shared during the training.
