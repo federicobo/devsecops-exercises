@@ -72,8 +72,8 @@ public class CommentsCache {
 
     // TODO fix me disabled for now.
     if (securityEnabled) {
-      xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE); // Disable external entities
-      xif.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE); // Disable DTD support
+      xif.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE
+      xif.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // XMLInputFactory.SUPPORT_DTD, Boolean.FALSE
     }
 
     var xsr = xif.createXMLStreamReader(new StringReader(xml));
