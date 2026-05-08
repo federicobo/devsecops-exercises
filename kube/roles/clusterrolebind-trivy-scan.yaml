@@ -2,6 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: trivy-scan-binding
+  namespace: dso-course
 subjects:
 - kind: User
   name: dso-user

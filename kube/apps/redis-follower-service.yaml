@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-follower
+  namespace: dso-apps
   labels:
     app: redis
     role: follower
